@@ -34,6 +34,10 @@ resource "aws_security_group" "example-sg" {
 resource "aws_autoscaling_group" "practice-instances-group" {
   launch_configuration = "${aws_launch_configuration.practice-instances.id}"
   availability_zones = ["${data.aws_availability_zones.all.names}"]  #This is how you pass the names of AZ's avaialble specifically to your AWS account. {data.TYPE.NAME.ATTRIBUTE}
+
+  load_balancers        = ["${aws_elb.example.name}"]
+  health_check_type  = "ELB"
+
   min_size = 2
   max_size = 10
 
@@ -65,6 +69,14 @@ resource "aws_elb" "example" {
         lb_protocol           = "http"
         instance_port        = "${var.server_port}"
         instance_protocol = "http"
+    }
+
+    health_check {                                                          #Health check request
+        healthy_threshold     = 2
+        unhealthy_threshold = 2
+        timeout                      = 3
+        interval                      = 30
+        target                         = "HTTP:${var.server_port}/"
     }
 }
 
