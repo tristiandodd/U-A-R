@@ -33,5 +33,14 @@ resource "aws_security_group" "example-sg" {
 
 resource "aws_autoscaling_group" "practice-instances-group" {
   launch_configuration = "${aws_launch_configuration.practice-instances.id}"
+  availability_zones = ["${data.aws_availability_zones.all.names}"]  #This is how you pass the names of AZ's avaialble specifically to your AWS account. {data.TYPE.NAME.ATTRIBUTE}
+  min_size = 2
+  max_size = 10
+
+  tag {
+    key                               = "Name"
+    value                            = "terraform-asg-example"
+    propagate_at_launch    = true
+  }
 }
 
